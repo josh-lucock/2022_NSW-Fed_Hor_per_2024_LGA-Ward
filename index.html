@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title>2022 House of Representatives Results per NSW LGA Ward</title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="data/2022_NSW_HoR_perLGAWard_2PP_1.js"></script>
+        <script src="data/2022_NSW_HoR_perLGAWard_2CP_2.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[-37.422943368309156,139.64482004793658],[-26.66039966947294,162.12675283842404]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleRoad_0');
+        map.getPane('pane_GoogleRoad_0').style.zIndex = 400;
+        var layer_GoogleRoad_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleRoad_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_GoogleRoad_0;
+        map.addLayer(layer_GoogleRoad_0);
+        function pop_2022_NSW_HoR_perLGAWard_2PP_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">LGA_Ward</th>\
+                        <td>' + (feature.properties['LGA_Ward'] !== null ? autolinker.link(feature.properties['LGA_Ward'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ALP</th>\
+                        <td>' + (feature.properties['ALP'] !== null ? autolinker.link(feature.properties['ALP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">LNP</th>\
+                        <td>' + (feature.properties['LNP'] !== null ? autolinker.link(feature.properties['LNP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">GRN</th>\
+                        <td>' + (feature.properties['GRN'] !== null ? autolinker.link(feature.properties['GRN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ON</th>\
+                        <td>' + (feature.properties['ON'] !== null ? autolinker.link(feature.properties['ON'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">UAP</th>\
+                        <td>' + (feature.properties['UAP'] !== null ? autolinker.link(feature.properties['UAP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">LDP</th>\
+                        <td>' + (feature.properties['LDP'] !== null ? autolinker.link(feature.properties['LDP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">IND</th>\
+                        <td>' + (feature.properties['IND'] !== null ? autolinker.link(feature.properties['IND'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Lead_IND</th>\
+                        <td>' + (feature.properties['Lead_IND'] !== null ? autolinker.link(feature.properties['Lead_IND'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Others</th>\
+                        <td>' + (feature.properties['Others'] !== null ? autolinker.link(feature.properties['Others'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">1_Other</th>\
+                        <td>' + (feature.properties['1_Other'] !== null ? autolinker.link(feature.properties['1_Other'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Formals</th>\
+                        <td>' + (feature.properties['Formals'] !== null ? autolinker.link(feature.properties['Formals'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Formality</th>\
+                        <td>' + (feature.properties['Formality'] !== null ? autolinker.link(feature.properties['Formality'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TotalVotes</th>\
+                        <td>' + (feature.properties['TotalVotes'] !== null ? autolinker.link(feature.properties['TotalVotes'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ALP_2PP</th>\
+                        <td>' + (feature.properties['ALP_2PP'] !== null ? autolinker.link(feature.properties['ALP_2PP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">LNP_2PP</th>\
+                        <td>' + (feature.properties['LNP_2PP'] !== null ? autolinker.link(feature.properties['LNP_2PP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+        function style_2022_NSW_HoR_perLGAWard_2PP_1_0(feature) {
+            var context = {
+                feature: feature,
+                variables: {}
+            };
+            // Start of if blocks and style check logic
+            if (exp_2022_NSW_HoR_perLGAWard_2PP_1rule0_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2PP_1',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(246,214,200,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2PP_1rule1_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2PP_1',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(236,132,110,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2PP_1rule2_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2PP_1',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(202,0,32,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2PP_1rule3_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2PP_1',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(207,227,237,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2PP_1rule4_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2PP_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(118,180,213,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2PP_1rule5_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2PP_1',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(5,113,176,0.6)',
+                interactive: true,
+            };
+                }
+            else {
+                return {fill: false, stroke: false};
+            }
+        }
+        map.createPane('pane_2022_NSW_HoR_perLGAWard_2PP_1');
+        map.getPane('pane_2022_NSW_HoR_perLGAWard_2PP_1').style.zIndex = 401;
+        map.getPane('pane_2022_NSW_HoR_perLGAWard_2PP_1').style['mix-blend-mode'] = 'normal';
+        var layer_2022_NSW_HoR_perLGAWard_2PP_1 = new L.geoJson(json_2022_NSW_HoR_perLGAWard_2PP_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_2022_NSW_HoR_perLGAWard_2PP_1',
+            layerName: 'layer_2022_NSW_HoR_perLGAWard_2PP_1',
+            pane: 'pane_2022_NSW_HoR_perLGAWard_2PP_1',
+            onEachFeature: pop_2022_NSW_HoR_perLGAWard_2PP_1,
+            style: style_2022_NSW_HoR_perLGAWard_2PP_1_0,
+        });
+        bounds_group.addLayer(layer_2022_NSW_HoR_perLGAWard_2PP_1);
+        function pop_2022_NSW_HoR_perLGAWard_2CP_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">LGA_Ward</th>\
+                        <td>' + (feature.properties['LGA_Ward'] !== null ? autolinker.link(feature.properties['LGA_Ward'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ALP</th>\
+                        <td>' + (feature.properties['ALP'] !== null ? autolinker.link(feature.properties['ALP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">LNP</th>\
+                        <td>' + (feature.properties['LNP'] !== null ? autolinker.link(feature.properties['LNP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">GRN</th>\
+                        <td>' + (feature.properties['GRN'] !== null ? autolinker.link(feature.properties['GRN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ON</th>\
+                        <td>' + (feature.properties['ON'] !== null ? autolinker.link(feature.properties['ON'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">UAP</th>\
+                        <td>' + (feature.properties['UAP'] !== null ? autolinker.link(feature.properties['UAP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">LDP</th>\
+                        <td>' + (feature.properties['LDP'] !== null ? autolinker.link(feature.properties['LDP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">IND</th>\
+                        <td>' + (feature.properties['IND'] !== null ? autolinker.link(feature.properties['IND'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Lead_IND</th>\
+                        <td>' + (feature.properties['Lead_IND'] !== null ? autolinker.link(feature.properties['Lead_IND'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Others</th>\
+                        <td>' + (feature.properties['Others'] !== null ? autolinker.link(feature.properties['Others'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">1_Other</th>\
+                        <td>' + (feature.properties['1_Other'] !== null ? autolinker.link(feature.properties['1_Other'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Formals</th>\
+                        <td>' + (feature.properties['Formals'] !== null ? autolinker.link(feature.properties['Formals'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Formality</th>\
+                        <td>' + (feature.properties['Formality'] !== null ? autolinker.link(feature.properties['Formality'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TotalVotes</th>\
+                        <td>' + (feature.properties['TotalVotes'] !== null ? autolinker.link(feature.properties['TotalVotes'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ALP_2CP</th>\
+                        <td>' + (feature.properties['ALP_2CP'] !== null ? autolinker.link(feature.properties['ALP_2CP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">LNP_2CP</th>\
+                        <td>' + (feature.properties['LNP_2CP'] !== null ? autolinker.link(feature.properties['LNP_2CP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">GRN_2CP</th>\
+                        <td>' + (feature.properties['GRN_2CP'] !== null ? autolinker.link(feature.properties['GRN_2CP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">OTH_2CP</th>\
+                        <td>' + (feature.properties['OTH_2CP'] !== null ? autolinker.link(feature.properties['OTH_2CP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">OTH_PARTY</th>\
+                        <td>' + (feature.properties['OTH_PARTY'] !== null ? autolinker.link(feature.properties['OTH_PARTY'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+        function style_2022_NSW_HoR_perLGAWard_2CP_2_0(feature) {
+            var context = {
+                feature: feature,
+                variables: {}
+            };
+            // Start of if blocks and style check logic
+            if (exp_2022_NSW_HoR_perLGAWard_2CP_2rule0_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2CP_2',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(246,214,200,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2CP_2rule1_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2CP_2',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(236,132,110,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2CP_2rule2_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2CP_2',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(202,0,32,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2CP_2rule3_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2CP_2',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(207,227,237,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2CP_2rule4_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2CP_2',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(118,180,213,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2CP_2rule5_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2CP_2',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(5,113,176,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2CP_2rule6_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2CP_2',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(201,234,194,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2CP_2rule7_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2CP_2',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(123,199,124,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2CP_2rule8_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2CP_2',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(42,146,75,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2CP_2rule9_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2CP_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(201,201,201,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2CP_2rule10_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2CP_2',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(152,152,152,0.6)',
+                interactive: true,
+            };
+                }
+                else if (exp_2022_NSW_HoR_perLGAWard_2CP_2rule11_eval_expression(context)) {
+                  return {
+                pane: 'pane_2022_NSW_HoR_perLGAWard_2CP_2',
+                opacity: 1,
+                color: 'rgba(0,0,0,0.6)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(103,103,103,0.6)',
+                interactive: true,
+            };
+                }
+            else {
+                return {fill: false, stroke: false};
+            }
+        }
+        map.createPane('pane_2022_NSW_HoR_perLGAWard_2CP_2');
+        map.getPane('pane_2022_NSW_HoR_perLGAWard_2CP_2').style.zIndex = 402;
+        map.getPane('pane_2022_NSW_HoR_perLGAWard_2CP_2').style['mix-blend-mode'] = 'normal';
+        var layer_2022_NSW_HoR_perLGAWard_2CP_2 = new L.geoJson(json_2022_NSW_HoR_perLGAWard_2CP_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_2022_NSW_HoR_perLGAWard_2CP_2',
+            layerName: 'layer_2022_NSW_HoR_perLGAWard_2CP_2',
+            pane: 'pane_2022_NSW_HoR_perLGAWard_2CP_2',
+            onEachFeature: pop_2022_NSW_HoR_perLGAWard_2CP_2,
+            style: style_2022_NSW_HoR_perLGAWard_2CP_2_0,
+        });
+        bounds_group.addLayer(layer_2022_NSW_HoR_perLGAWard_2CP_2);
+        map.addLayer(layer_2022_NSW_HoR_perLGAWard_2CP_2);
+            var title = new L.Control();
+            title.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info');
+                this.update();
+                return this._div;
+            };
+            title.update = function () {
+                this._div.innerHTML = '<h2>2022 House of Representatives Results per NSW LGA Ward</h2>';
+            };
+            title.addTo(map);
+            var abstract = new L.Control({'position':'topright'});
+            abstract.onAdd = function (map) {
+                this._div = L.DomUtil.create('div',
+                'leaflet-control abstract');
+                this._div.id = 'abstract'
+
+                    abstract.show();
+                    return this._div;
+                };
+                abstract.show = function () {
+                    this._div.classList.remove("abstract");
+                    this._div.classList.add("abstractUncollapsed");
+                    this._div.innerHTML = 'Results of the 2022 Federal Election for the House of Representatives estimated per 2022 New South Wales Local Government Area and Wards.';
+            };
+            abstract.addTo(map);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'2022_NSW_HoR_per-LGA-Ward_2CP<br /><table><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2CP_2_Labor50550.png" /></td><td>Labor 50-55%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2CP_2_Labor55601.png" /></td><td>Labor 55-60%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2CP_2_Labor602.png" /></td><td>Labor >60%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2CP_2_LiberalsNationals50553.png" /></td><td>Liberals & Nationals 50-55%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2CP_2_LiberalsNationals55604.png" /></td><td>Liberals & Nationals 55-60%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2CP_2_LiberalsNationals605.png" /></td><td>Liberals & Nationals >60%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2CP_2_Greens50556.png" /></td><td>Greens 50-55%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2CP_2_Greens55607.png" /></td><td>Greens 55-60%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2CP_2_Greens608.png" /></td><td>Greens >60%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2CP_2_IndependentsOthers50559.png" /></td><td>Independents & Others 50-55%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2CP_2_IndependentsOthers556010.png" /></td><td>Independents & Others 55-60%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2CP_2_IndependentsOthers6011.png" /></td><td>Independents & Others >60%</td></tr></table>': layer_2022_NSW_HoR_perLGAWard_2CP_2,'2022_NSW_HoR_per-LGA-Ward_2PP<br /><table><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2PP_1_Labor2PP50550.png" /></td><td>Labor 2PP 50-55%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2PP_1_Labor2PP55601.png" /></td><td>Labor 2PP 55-60%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2PP_1_Labor2PP602.png" /></td><td>Labor 2PP >60%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2PP_1_LiberalsNationals2PP50553.png" /></td><td>Liberals & Nationals 2PP 50-55%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2PP_1_LiberalsNationals2PP55604.png" /></td><td>Liberals & Nationals 2PP 55-60%</td></tr><tr><td style="text-align: center;"><img src="legend/2022_NSW_HoR_perLGAWard_2PP_1_LiberalsNationals2PP605.png" /></td><td>Liberals & Nationals 2PP >60%</td></tr></table>': layer_2022_NSW_HoR_perLGAWard_2PP_1,"Google Road": layer_GoogleRoad_0,},{collapsed:false}).addTo(map);
+        setBounds();
+        map.addControl(new L.Control.Search({
+            layer: layer_2022_NSW_HoR_perLGAWard_2CP_2,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'LGA_Ward'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-binoculars';
+        </script>
+    </body>
+</html>
